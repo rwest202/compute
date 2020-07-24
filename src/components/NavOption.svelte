@@ -1,18 +1,12 @@
 <script>
-    import { Link } from 'svelte-routing';
+    import { url } from '@sveltech/routify';
 
     export let to;
     export let icon;
-
-    function getProps() {
-        return {
-            class: 'nav-option'
-        };
-    }
 </script>
 
 <style>
-    :global(.nav-option) {
+    a {
         text-decoration: none;
     }
 
@@ -34,8 +28,8 @@
     }
 </style>
 
-<Link {to} {getProps}>
+<a href={$url(to)}>
     <div>
         <i class="fas fa-{icon} fa-lg" />
     </div>
-</Link>
+</a>

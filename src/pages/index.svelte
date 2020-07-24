@@ -1,7 +1,5 @@
 <script>
-    import Route from '../Route.svelte';
-
-    export let location;
+    import SideNavLayout from '../layouts/SideNavLayout.svelte';
 </script>
 
 <style>
@@ -17,7 +15,7 @@
     }
 </style>
 
-<Route>
+<SideNavLayout>
     <h1>Compute</h1>
     <h2>beep boop</h2>
-</Route>
+</SideNavLayout>

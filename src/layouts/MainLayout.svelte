@@ -1,6 +1,6 @@
 <style>
     main {
-        height: 100vh;
+        height: calc(100vh - 50px);
         width: 100%;
         display: flex;
     }
@@ -9,9 +9,15 @@
         z-index: 1;
         flex: 0 0 300px;
         padding: 30px;
-        box-shadow: 0 0 10px 0 #0b8dfe;
+        box-shadow: 5px 0 5px -2px #0b8dfe;
         background-color: #0b8dfe;
         background-image: url('/img/circuit-board.svg');
+        background-blend-mode: soft-light;
+        overflow: auto;
+    }
+
+    div {
+        width: 100%;
     }
 </style>
 
@@ -25,5 +31,7 @@
         <slot name="sidebar" />
     </nav>
 
-    <slot name="content" />
+    <div>
+        <slot name="content" />
+    </div>
 </main>

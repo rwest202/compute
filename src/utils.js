@@ -1,4 +1,4 @@
-export function windowDimensions() {
+export function contentDimensions() {
     const w =
         window.innerWidth ||
         document.documentElement.clientWidth ||
@@ -8,5 +8,5 @@ export function windowDimensions() {
         document.documentElement.clientHeight ||
         document.body.clientHeight;
 
-    return [w, h];
+    return [w - 300, h - 50];
 }

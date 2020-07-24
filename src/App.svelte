@@ -1,32 +1,33 @@
 <script>
-    import { fade } from 'svelte/transition';
-    import { Router, Route } from 'svelte-routing';
-
-    import { currentTopic } from './store/navigation';
-
-    import MainLayout from './components/MainLayout.svelte';
-    import SideNav from './components/SideNav.svelte';
-    import Welcome from './components/routes/Welcome.svelte';
-    import UlamSpiral from './components/routes/UlamSpiral.svelte';
+    import { Router } from '@sveltech/routify';
+    import { routes } from '@sveltech/routify/tmp/routes';
 </script>
 
 <style>
-    ul {
-        padding: 0;
+    img {
+        height: 30px;
     }
     div {
+        z-index: 100;
         width: 100%;
+        height: 50px;
+        padding: 0 30px;
+        display: flex;
+        align-items: center;
+        border-bottom: 2px solid black;
+    }
+
+    h1 {
+        margin: 0 0 0 15px;
+        font-size: 20px;
     }
 </style>
 
-<Router>
-    <MainLayout>
-        <ul slot="sidebar">
-            <SideNav />
-        </ul>
-        <div slot="content">
-            <Route path="/" component={Welcome} />
-            <Route path="/ulam-spiral" component={UlamSpiral} />
-        </div>
-    </MainLayout>
-</Router>
+<div>
+    <a href="/">
+        <img src="/img/logo.svg" alt="" />
+    </a>
+    <h1>Compute</h1>
+    <p>, picturing mathematics.</p>
+</div>
+<Router {routes} />

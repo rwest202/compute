@@ -1,24 +1,16 @@
 <script>
     import { onMount } from 'svelte';
-    import { Link } from 'svelte-routing';
+    import { url, isActive } from '@sveltech/routify';
 
     export let to = '';
     export let icon;
     export let configurable = false;
 
     let active;
-
-    function getProps({ isCurrent }) {
-        active = isCurrent;
-
-        return {
-            class: 'link'
-        };
-    }
 </script>
 
 <style>
-    :global(.navlink > a) {
+    a {
         text-decoration: none;
         display: flex;
         flex-direction: column;
@@ -73,15 +65,15 @@
     }
 </style>
 
-<li on: class="navlink" class:active>
-    <Link {to} {getProps}>
+<li on: class="navlink" class:active={$isActive(to)}>
+    <a href={$url(to)}>
         <img alt="" src={icon} />
 
         <p>
             <slot />
         </p>
-    </Link>
-    <div class:show={active && configurable}>
+    </a>
+    <div class:show={$isActive(to) && configurable}>
         <slot name="options" />
     </div>
 </li>
