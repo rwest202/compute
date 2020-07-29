@@ -13,11 +13,12 @@
         background-color: #0b8dfe;
         background-image: url('/img/circuit-board.svg');
         background-blend-mode: soft-light;
-        overflow: auto;
     }
 
     div {
         width: 100%;
+        height: 100%;
+        overflow: hidden;
     }
 </style>
 

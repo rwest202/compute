@@ -7,7 +7,7 @@
     ul {
         position: relative;
         padding: 0;
-        overflow: auto;
+        margin: 0;
     }
 </style>
 

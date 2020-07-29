@@ -1,10 +1,13 @@
-<script>
+<script lang="ts">
     import MainLayout from '../../layouts/MainLayout.svelte';
     import UlamSpiral from '../../components/UlamSpiral.svelte';
 
     import BackButton from '../../components/BackButton.svelte';
     import Slider from '../../components/Slider.svelte';
     import ColorPicker from '../../components/ColorPicker.svelte';
+    import FieldGroup from '../../components/FieldGroup.svelte';
+    import FieldLabel from '../../components/FieldLabel.svelte';
+    import Button from '../../components/Button.svelte';
 
     import {
         backgroundColor,
@@ -15,7 +18,7 @@
         gridWidth,
         density,
         throttle,
-        dataUrl
+        dataUrl,
     } from '../../store/spiral';
 </script>
 
@@ -23,7 +26,7 @@
     h1 {
         color: white;
         font-size: 30px;
-        margin-top: 30px;
+        margin-top: 30px 0;
     }
 </style>
 
@@ -33,74 +36,75 @@
 
         <h1>Configure</h1>
 
-        <label>
-            <b>Style</b>
-        </label>
-        <br />
-        <label>Background</label>
-        <ColorPicker bind:color={$backgroundColor}>DOT COLOR</ColorPicker>
-        <br />
-        <br />
-        <label>
-            <b>Prime Dots</b>
-        </label>
-        <br />
-        <label>Color</label>
-        <ColorPicker bind:color={$dotColor}>DOT COLOR</ColorPicker>
-        <br />
-        <br />
-        <label>Size</label>
-        <br />
-        <Slider min={1} max={4} step={0.5} bind:value={$dotSize} />
-        <br />
-        <br />
-        <label>
-            <b>Grid</b>
-        </label>
-        <br />
-        <label>Show Grid</label>
-        <input type="checkbox" bind:checked={$showGrid} />
-        <br />
-        <br />
-        <label>Color</label>
-        <ColorPicker bind:color={$gridColor}>DOT COLOR</ColorPicker>
-        <br />
-        <br />
-        <label>Line Width</label>
-        <br />
-        <Slider min={1} max={4} step={0.5} bind:value={$gridWidth} />
-        <br />
-        <br />
-        <label>
-            <b>Performance</b>
-        </label>
-        <br />
-        <label>Render Density</label>
-        <br />
-        <Slider min={2} max={15} step={1} bind:value={$density} />
-        <br />
-        <br />
-        <label>Throttle Rendering</label>
-        <br />
-        <input type="number" bind:value={$throttle} />
-        <br />
-        <br />
-        <button
+        <FieldGroup title="Style">
+            <FieldLabel for="backgroundColor">Background</FieldLabel>
+            <ColorPicker id="backgroundColor" bind:color={$backgroundColor} />
+
+        </FieldGroup>
+
+        <FieldGroup title="Prime Number Dots">
+            <FieldLabel for="dotColor">Color</FieldLabel>
+            <ColorPicker id="dotColor" bind:color={$dotColor} />
+
+            <FieldLabel for="dotSize">Size</FieldLabel>
+            <Slider
+                id="dotSize"
+                min={1}
+                max={4}
+                step={0.5}
+                bind:value={$dotSize} />
+        </FieldGroup>
+
+        <FieldGroup title="Grid">
+            <FieldLabel for="showGrid">Show Grid</FieldLabel>
+            <input id="showGrid" type="checkbox" bind:checked={$showGrid} />
+
+            <FieldLabel for="dotColor">Color</FieldLabel>
+            <ColorPicker id="dotColor" bind:color={$gridColor} />
+
+            <FieldLabel for="lineWidth">Line Width</FieldLabel>
+            <Slider
+                id="lineWidth"
+                min={1}
+                max={4}
+                step={1}
+                bind:value={$gridWidth} />
+
+        </FieldGroup>
+
+        <FieldGroup title="Performance">
+            <FieldLabel for="renderDensity">Render Density</FieldLabel>
+            <Slider
+                id="renderDensity"
+                min={2}
+                max={15}
+                step={1}
+                bind:value={$density} />
+
+            <FieldLabel for="throttleRendering">
+                Throttle Rendering (ms)
+            </FieldLabel>
+            <input
+                id="throttleRendering"
+                type="number"
+                bind:value={$throttle} />
+
+        </FieldGroup>
+        <Button
             on:click={() => ($dataUrl = document
                     .querySelector('canvas')
                     .toDataURL())}>
             Save Image
-        </button>
+        </Button>
         {#if $dataUrl}
-            <iframe title="Download image" src={$dataUrl}>
-                Download Image
+            <iframe title="Download Image">
+                <a href="Download image" src={$dataUrl}>Download Image</a>
             </iframe>
         {/if}
 
-        <h1>Stats</h1>
-        <label>Number of primes</label>
-        <br />
-        <label>Rendered in 20ms</label>
+        <FieldLabel title="Stats" />
+        <FieldLabel title="Number of primes" />
+        <FieldLabel title="Rendered in 20ms" />
 
     </div>
     <div slot="content">

@@ -1,12 +1,10 @@
-<script>
+<script lang="ts">
     import { onMount } from 'svelte';
     import { url, isActive } from '@sveltech/routify';
 
     export let to = '';
-    export let icon;
+    export let icon: string;
     export let configurable = false;
-
-    let active;
 </script>
 
 <style>
@@ -18,37 +16,37 @@
         width: 100%;
         height: 100%;
         padding: 15px;
-        color: white;
         flex: 3;
+        color: black;
     }
 
     li {
+        display: flex;
         transition: border-color 150ms ease;
         cursor: pointer;
         position: relative;
         list-style: none;
         height: 200px;
-        background: #0b8dfe;
-        border: 2px solid rgba(255, 255, 255, 0.2);
+        background: white;
         border-bottom-width: 8px;
         margin-bottom: 20px;
-        display: flex;
+        border-radius: 8px;
     }
 
     li.active {
         border-color: white;
-        box-shadow: 0 0 10px 0 white, inset 0 0 10px 0 white;
+        box-shadow: 0 0 10px white;
         border-bottom-width: 8px;
     }
 
     img {
         height: 70px;
         width: 70px;
+        filter: invert();
     }
 
     li p {
         margin: 0;
-        color: white;
         font-size: 20px;
     }
 
@@ -57,7 +55,7 @@
         flex-direction: column-reverse;
         transition: flex 150ms ease;
         flex: 0 0 0px;
-        overflow-x: hidden;
+        overflow: hidden;
     }
 
     div.show {

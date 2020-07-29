@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
     import { url } from '@sveltech/routify';
 
-    export let to;
-    export let icon;
+    export let to: string;
+    export let icon: string;
 </script>
 
 <style>
@@ -16,15 +16,15 @@
         align-items: center;
         width: 50px;
         height: 50px;
-        transition: background-color 150ms ease;
+        transition: font-size 150ms ease;
     }
 
     div:hover {
-        background-color: rgba(255, 255, 255, 0.3);
+        font-size: 22px;
     }
 
     i {
-        color: white;
+        color: black;
     }
 </style>
 

@@ -5,24 +5,37 @@
         "build": "rollup -c",
         "dev": "routify -c dev-build",
         "dev-build": "rollup -c -w",
-        "worker": "rollup -i src/workers/spiral.js -o public/spiral.js -p @rollup/plugin-json -w",
+        "analyze": "rollup -c -p 'rollup-plugin-analyzer={ summaryOnly: true }'",
+        "worker": "rollup -i src/workers/spiral.ts -o public/workers/spiral.js -p @rollup/plugin-json -p @rollup/plugin-typescript -w",
         "start": "sirv public -s"
     },
     "devDependencies": {
-        "@rollup/plugin-commonjs": "13.0.0",
-        "@rollup/plugin-node-resolve": "8.0.1",
-        "rollup": "2.15.0",
+        "@rollup/plugin-commonjs": "14.0.0",
+        "@rollup/plugin-json": "4.1.0",
+        "@rollup/plugin-node-resolve": "8.4.0",
+        "@rollup/plugin-typescript": "5.0.2",
+        "@tsconfig/svelte": "1.0.3",
+        "@typescript-eslint/eslint-plugin": "3.7.0",
+        "@typescript-eslint/parser": "3.7.0",
+        "eslint": "7.5.0",
+        "eslint-plugin-svelte3": "2.7.3",
+        "rollup": "2.23.0",
+        "rollup-plugin-analyzer": "3.3.0",
+        "rollup-plugin-eslint": "7.0.0",
         "rollup-plugin-livereload": "1.3.0",
-        "rollup-plugin-svelte": "5.2.2",
+        "rollup-plugin-svelte": "5.2.3",
         "rollup-plugin-terser": "6.1.0",
-        "svelte": "3.23.0"
+        "rollup-plugin-visualizer": "4.0.4",
+        "sirv-cli": "1.0.3",
+        "svelte": "3.24.0",
+        "svelte-preprocess": "4.0.8",
+        "tslib": "2.0.0",
+        "typescript": "3.9.7"
     },
     "dependencies": {
-        "@rollup/plugin-json": "4.1.0",
         "@simonwep/pickr": "1.7.2",
-        "@sveltech/routify": "1.7.13",
+        "@sveltech/routify": "1.9.5",
         "lodash.debounce": "4.0.8",
-        "paper": "0.12.8",
-        "sirv-cli": "0.4.6"
+        "paper": "0.12.11"
     }
 }

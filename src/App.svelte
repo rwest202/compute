@@ -7,14 +7,15 @@
     img {
         height: 30px;
     }
-    div {
+    header {
         z-index: 100;
         width: 100%;
         height: 50px;
         padding: 0 30px;
         display: flex;
         align-items: center;
-        border-bottom: 2px solid black;
+        background: #141414;
+        color: white;
     }
 
     h1 {
@@ -23,11 +24,11 @@
     }
 </style>
 
-<div>
+<header>
     <a href="/">
         <img src="/img/logo.svg" alt="" />
     </a>
     <h1>Compute</h1>
     <p>, picturing mathematics.</p>
-</div>
+</header>
 <Router {routes} />

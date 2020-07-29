@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+    import { PaperScope, Path, Point, Color } from 'paper/dist/paper-core';
     import debounce from 'lodash.debounce';
     import { onMount, onDestroy } from 'svelte';
 
@@ -14,13 +15,15 @@
         throttle,
         dataUrl
     } from '../store/spiral';
+    import { Size } from 'paper';
 
     // The user inputted density number will be divided by this constant. This
     // constant is arbitrariily picked because it fills the screen with dots
     const DENSITY_CONSTANT = 3000;
 
-    let canvas;
-    let worker;
+    const paper = new PaperScope();
+    let canvas: HTMLCanvasElement;
+    let worker: Worker;
 
     $: {
         // Reactive update when these variables change
@@ -65,24 +68,25 @@
         const x = paper.view.bounds.width / 2;
         const y = paper.view.bounds.height / 2;
 
-        worker = new Worker('/spiral.js');
+        // Refers to built worker file
+        worker = new Worker('/workers/spiral.js');
 
         // Background
-        const background = new paper.Path.Rectangle([0, 0], [w, h]);
-        background.fillColor = $backgroundColor;
+        const background = new Path.Rectangle(new Point(0, 0), new Size(w, h));
+        background.fillColor = new Color($backgroundColor);
 
         // Draw Ulam Sprial grid
         if ($showGrid) {
-            const line = new paper.Path({
+            const line = new Path({
                 from: [x, y],
                 strokeWidth: $gridWidth,
                 strokeColor: $gridColor
             });
-            line.moveTo(x, y);
+            line.moveTo(new Point(x, y));
             for (let i = 1; i < DENSITY_CONSTANT / $density; i++) {
                 const even = i % 2 === 0;
-                line.lineBy((even ? -$density : $density) * i, 0);
-                line.lineBy(0, (even ? $density : -$density) * i);
+                line.lineBy(new Point((even ? -$density : $density) * i, 0));
+                line.lineBy(new Point(0, (even ? $density : -$density) * i));
             }
         }
 
@@ -102,7 +106,7 @@
         function drawPrimeDots({ data }) {
             // Prevent stray events from firing after the component is destroyed
             if (!paper.view) return;
-            new paper.Path.Circle({
+            new Path.Circle({
                 center: data,
                 radius: $dotSize,
                 fillColor: $dotColor

@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
     import { url } from '@sveltech/routify';
 
-    export let to;
+    export let to: string;
 </script>
 
 <style>
