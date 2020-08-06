@@ -3,6 +3,12 @@
     import SideNav from '../components/SideNav.svelte';
 </script>
 
+<style>
+    [slot="sidebar"] {
+        padding: 30px;
+    }
+</style>
+
 <MainLayout>
     <div slot="sidebar">
         <SideNav />

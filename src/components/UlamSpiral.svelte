@@ -12,8 +12,7 @@
         gridColor,
         gridWidth,
         density,
-        throttle,
-        dataUrl
+        throttle
     } from '../store/spiral';
     import { Size } from 'paper';
 

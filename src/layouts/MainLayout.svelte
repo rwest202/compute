@@ -8,7 +8,6 @@
     nav {
         z-index: 1;
         flex: 0 0 300px;
-        padding: 30px;
         box-shadow: 5px 0 5px -2px #0b8dfe;
         background-color: #0b8dfe;
         background-image: url('/img/circuit-board.svg');
@@ -19,7 +18,8 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-    }
+    } 
+    
 </style>
 
 <main>

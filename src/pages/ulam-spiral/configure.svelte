@@ -1,14 +1,4 @@
 <script lang="ts">
-    import MainLayout from '../../layouts/MainLayout.svelte';
-    import UlamSpiral from '../../components/UlamSpiral.svelte';
-
-    import BackButton from '../../components/BackButton.svelte';
-    import Slider from '../../components/Slider.svelte';
-    import ColorPicker from '../../components/ColorPicker.svelte';
-    import FieldGroup from '../../components/FieldGroup.svelte';
-    import FieldLabel from '../../components/FieldLabel.svelte';
-    import Button from '../../components/Button.svelte';
-
     import {
         backgroundColor,
         dotColor,
@@ -20,6 +10,15 @@
         throttle,
         dataUrl,
     } from '../../store/spiral';
+
+    import MainLayout from '../../layouts/MainLayout.svelte';
+    import UlamSpiral from '../../components/UlamSpiral.svelte';
+    import BackButton from '../../components/BackButton.svelte';
+    import Slider from '../../components/Slider.svelte';
+    import ColorPicker from '../../components/ColorPicker.svelte';
+    import FieldGroup from '../../components/FieldGroup.svelte';
+    import FieldLabel from '../../components/FieldLabel.svelte';
+    import Button from '../../components/Button.svelte';
 </script>
 
 <style>
@@ -27,6 +26,13 @@
         color: white;
         font-size: 30px;
         margin-top: 30px 0;
+    }
+    
+    /* Windows Chrome, make configure section scrollable */
+    [slot="sidebar"] {
+        height: 100%;
+        overflow: auto;
+        padding: 30px;
     }
 </style>
 
@@ -90,17 +96,6 @@
                 bind:value={$throttle} />
 
         </FieldGroup>
-        <Button
-            on:click={() => ($dataUrl = document
-                    .querySelector('canvas')
-                    .toDataURL())}>
-            Save Image
-        </Button>
-        {#if $dataUrl}
-            <iframe title="Download Image">
-                <a href="Download image" src={$dataUrl}>Download Image</a>
-            </iframe>
-        {/if}
 
         <FieldLabel title="Stats" />
         <FieldLabel title="Number of primes" />
