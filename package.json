@@ -6,7 +6,7 @@
         "dev": "routify -c dev-build",
         "dev-build": "rollup -c -w",
         "analyze": "rollup -c -p 'rollup-plugin-analyzer={ summaryOnly: true }'",
-        "worker": "rollup -i src/workers/spiral.ts -o public/workers/spiral.js -p @rollup/plugin-json -p @rollup/plugin-typescript -w",
+        "worker": "rollup -c worker.config.js -w",
         "start": "sirv public -s"
     },
     "devDependencies": {
@@ -35,7 +35,6 @@
     "dependencies": {
         "@simonwep/pickr": "1.7.2",
         "@sveltech/routify": "1.9.5",
-        "lodash.debounce": "4.0.8",
         "paper": "0.12.11"
     }
 }

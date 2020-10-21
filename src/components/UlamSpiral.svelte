@@ -1,6 +1,5 @@
 <script lang="ts">
     import { PaperScope, Path, Point, Color } from 'paper/dist/paper-core';
-    import debounce from 'lodash.debounce';
     import { onMount, onDestroy } from 'svelte';
 
     import { contentDimensions } from '../utils';
@@ -12,7 +11,7 @@
         gridColor,
         gridWidth,
         density,
-        throttle
+        throttle,
     } from '../store/spiral';
     import { Size } from 'paper';
 
@@ -67,10 +66,9 @@
         const x = paper.view.bounds.width / 2;
         const y = paper.view.bounds.height / 2;
 
-        // Refers to built worker file
+        // Refers to pre-built worker file
         worker = new Worker('/workers/spiral.js');
 
-        // Background
         const background = new Path.Rectangle(new Point(0, 0), new Size(w, h));
         background.fillColor = new Color($backgroundColor);
 
@@ -79,7 +77,7 @@
             const line = new Path({
                 from: [x, y],
                 strokeWidth: $gridWidth,
-                strokeColor: $gridColor
+                strokeColor: $gridColor,
             });
             line.moveTo(new Point(x, y));
             for (let i = 1; i < DENSITY_CONSTANT / $density; i++) {
@@ -95,21 +93,20 @@
             y,
             length: DENSITY_CONSTANT / $density,
             density: $density,
-            throttle: $throttle
+            throttle: $throttle,
         });
 
-        /**
-         * Draw prime dots with worker data
-         * @param {Object} workerEvent.data - x & y coordinates of prime dot
-         */
-        function drawPrimeDots({ data }) {
+        function drawPrimeDots({ data }: { data: [number, number] }) {
             // Prevent stray events from firing after the component is destroyed
-            if (!paper.view) return;
-            new Path.Circle({
-                center: data,
-                radius: $dotSize,
-                fillColor: $dotColor
-            });
+            if (!paper.view) {
+                worker && worker.terminate();
+            } else {
+                new Path.Circle({
+                    center: data,
+                    radius: $dotSize,
+                    fillColor: $dotColor,
+                });
+            }
         }
         worker.onmessage = drawPrimeDots;
     }

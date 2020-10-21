@@ -7,6 +7,10 @@
     [slot="sidebar"] {
         padding: 30px;
     }
+
+    [slot="content"] {
+        position: relative;
+    }
 </style>
 
 <MainLayout>

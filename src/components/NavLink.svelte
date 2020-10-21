@@ -42,7 +42,6 @@
     img {
         height: 70px;
         width: 70px;
-        filter: invert();
     }
 
     li p {

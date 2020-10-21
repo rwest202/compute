@@ -27,9 +27,9 @@
         font-size: 30px;
         margin-top: 30px 0;
     }
-    
+
     /* Windows Chrome, make configure section scrollable */
-    [slot="sidebar"] {
+    [slot='sidebar'] {
         height: 100%;
         overflow: auto;
         padding: 30px;
@@ -45,7 +45,6 @@
         <FieldGroup title="Style">
             <FieldLabel for="backgroundColor">Background</FieldLabel>
             <ColorPicker id="backgroundColor" bind:color={$backgroundColor} />
-
         </FieldGroup>
 
         <FieldGroup title="Prime Number Dots">
@@ -94,13 +93,12 @@
                 id="throttleRendering"
                 type="number"
                 bind:value={$throttle} />
-
         </FieldGroup>
 
-        <FieldLabel title="Stats" />
+        <!-- <FieldLabel title="Stats" />
         <FieldLabel title="Number of primes" />
         <FieldLabel title="Rendered in 20ms" />
-
+ -->
     </div>
     <div slot="content">
         <UlamSpiral />

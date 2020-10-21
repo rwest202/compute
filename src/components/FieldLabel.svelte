@@ -5,7 +5,8 @@
         text-transform: uppercase;
         font-weight: bold;
         font-size: 14px;
-        color: rgba(255, 255, 255, 0.7);
+        letter-spacing: 1px;
+        color: rgba(255, 255, 255, 0.8);
     }
 </style>
 

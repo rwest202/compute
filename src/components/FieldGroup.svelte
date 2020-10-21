@@ -4,13 +4,21 @@
 
 <style>
     div {
-        margin: 30px 0;
+        margin: 0 0 30px 0;
     }
     p {
-        margin: 0 0 15px 0;
+        display: flex;
+        align-items: center;
+        position: relative;
+        margin: 0 -10px 15px -10px;
         font-size: 18px;
         font-weight: bold;
-        color: white;
+        color: black;
+        width: 100%;
+        background: white;
+        padding: 3px 10px;
+        border-radius: 10px;
+        box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
     }
 </style>
 

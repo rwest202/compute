@@ -30714,3 +30714,4 @@ onmessage = function (e) {
         }
     }
 };
+//# sourceMappingURL=spiral.js.map

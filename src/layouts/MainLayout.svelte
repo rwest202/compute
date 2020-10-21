@@ -1,8 +1,12 @@
+<script lang="ts">
+    let minimized = false;
+</script>
+
 <style>
     main {
+        display: flex;
         height: calc(100vh - 50px);
         width: 100%;
-        display: flex;
     }
 
     nav {
@@ -17,9 +21,7 @@
     div {
         width: 100%;
         height: 100%;
-        overflow: hidden;
-    } 
-    
+    }
 </style>
 
 <main>
