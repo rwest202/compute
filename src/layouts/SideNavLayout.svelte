@@ -4,11 +4,11 @@
 </script>
 
 <style>
-    [slot="sidebar"] {
+    [slot='sidebar'] {
         padding: 30px;
     }
 
-    [slot="content"] {
+    [slot='content'] {
         position: relative;
     }
 </style>

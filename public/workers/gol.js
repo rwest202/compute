@@ -39,22 +39,34 @@ function gol (grid) {
 }
 
 onmessage = function (e) {
-    const { throttle, maxIterations, grid } = e.data;
-    let t0 = 0;
-    let t1 = 0;
+    const { startIndex, throttle, maxIterations, grid } = e.data;
     let step = grid;
-    self.postMessage(step);
-    for (let i = 0; i <= maxIterations;) {
+    let i = startIndex ? startIndex : 0;
+    let t0;
+    let t1;
+    let elapsed;
+    self.postMessage({ step, iteration: startIndex ? startIndex : 0 });
+    t0 = self.performance.now();
+    self.requestAnimationFrame(next);
+    function next() {
+        if (i >= maxIterations)
+            return;
+        self.requestAnimationFrame(next);
         t1 = self.performance.now();
-        if (t1 - t0 > throttle) {
-            t0 = self.performance.now();
+        elapsed = t1 - t0;
+        if (elapsed > throttle) {
+            t0 = t1 - (elapsed % throttle);
             step = gol(step);
             // If there are no changes, game has stalled out
             if (step === false) {
-                break;
+                return;
             }
-            self.postMessage(step);
             i++;
+            self.postMessage({
+                step,
+                iteration: i,
+                framerate: Math.round(1000 / elapsed),
+            });
         }
     }
 };

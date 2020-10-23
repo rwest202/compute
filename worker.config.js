@@ -1,15 +1,18 @@
 import typescript from '@rollup/plugin-typescript';
 
+const production = !process.env.ROLLUP_WATCH;
+
 export default {
     input: ['src/workers/spiral.ts', 'src/workers/gol.ts'],
     output: {
-        sourcemap: true,
+        sourcemap: !production,
         dir: 'public/workers',
     },
     plugins: [
         typescript(),
     ],
     watch: {
-        clearScreen: false,
+        include: 'src/workers/**',
+        exclude: 'src/!worker/**'
     },
 };
