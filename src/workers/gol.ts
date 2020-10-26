@@ -1,53 +1,110 @@
-import gol, { Grid } from '../math/gol';
+import gol, { Grid, ALIVE, DEAD } from '../math/gol';
+
+type StartPayload = {
+    startIndex?: number;
+    throttle: number;
+    maxIterations: number;
+    grid: Grid;
+}
+
+type ThrottlePayload = number;
+
+type MaxIterationsPayload = number;
+
+type CellStatePayload = {
+    x: number,
+    y: number,
+    state: typeof ALIVE | typeof DEAD,
+}
+
+type GameOfLifeMessagePayload = StartPayload | ThrottlePayload | MaxIterationsPayload | CellStatePayload;
 
 type GameOfLifeMessage = MessageEvent & {
     data: {
-        startIndex?: number;
-        throttle: number;
-        maxIterations: number;
-        grid: Grid;
+        action?: string;
+        payload: GameOfLifeMessagePayload;
     }
 };
 
-onmessage = function (e: GameOfLifeMessage) {
-    const { startIndex, throttle, maxIterations, grid } = e.data;
+class GameOfLifeWorker {
+    i = 0;
+    t0: number;
+    t1?: number;
+    elapsed?: number;
+    maxIterations: number;
+    step: Grid | false;
+    throttle: number;
 
-    let step: any = grid;
-    let i = startIndex ? startIndex : 0;
-    let t0: number;
-    let t1: number;
-    let elapsed: number;
+    constructor({ data: { startIndex, throttle, maxIterations, grid }}: GameOfLifeMessage) {
+        this.step = grid;
+        this.throttle = throttle;
+        this.maxIterations = maxIterations;
+        if (startIndex) {
+            this.i = startIndex;
+        }
 
-    (self as any).postMessage({ step, iteration: startIndex ? startIndex : 0 });
+        (self as any).postMessage({ step: grid, iteration: this.i });
 
-    t0 = self.performance.now();
-    self.requestAnimationFrame(next);
+        this.t0 = self.performance.now();
+        self.requestAnimationFrame(this.next);
+    }
 
-    function next() {
-        if (i >= maxIterations) return;
+    next = () => {
+        if (this.i >= this.maxIterations || !this.step) return;
 
-        self.requestAnimationFrame(next);
+        self.requestAnimationFrame(this.next);
 
-        t1 = self.performance.now()
-        elapsed = t1 - t0;
+        this.t1 = self.performance.now()
+        this.elapsed = this.t1 - this.t0;
 
-        if (elapsed > throttle) {
-            t0 = t1 - (elapsed % throttle);
-        
-            step = gol(step);
-
+        if (this.elapsed > this.throttle) {
+            this.t0 = this.t1 - (this.elapsed % this.throttle);
+            
+            this.step = gol(this.step);
+            
             // If there are no changes, game has stalled out
-            if (step === false) {
+            if (this.step === false) {
                 return;
             }
 
-            i++;
+            this.i++;
                 
             (self as any).postMessage({
-                step,
-                iteration: i,
-                framerate: Math.round(1000/elapsed),
+                step: this.step,
+                iteration: this.i,
+                framerate: Math.round(1000/this.elapsed),
             });
-        }   
+        }
+    }
+
+    setThrottle(throttle: number) {
+        this.throttle = throttle;
+    }
+
+    setMaxIterations(maxIterations: number) {
+        this.maxIterations  = maxIterations;
+    }
+
+    setCellState({ x, y, state }: CellStatePayload) {
+        this.step[x][y] = state;
+    }
+}
+
+let golWorker: GameOfLifeWorker;
+onmessage = function (e: GameOfLifeMessage) {
+    if (!golWorker) {
+        golWorker = new GameOfLifeWorker(e)
+    }
+
+    switch(e.data.action) {
+        case 'SET_THROTTLE':
+            golWorker.setThrottle(e.data.payload);
+            break;
+        case 'MAX_ITERATIONS':
+            golWorker.setMaxIterations(e.data.payload);
+            break;
+        case 'SET_CELL_STATE':
+            golWorker.setCellState(e.data.payload);
+            break;
     }
 }

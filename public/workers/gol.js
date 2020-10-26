@@ -38,36 +38,65 @@ function gol (grid) {
     return changed ? newGrid : false;
 }
 
-onmessage = function (e) {
-    const { startIndex, throttle, maxIterations, grid } = e.data;
-    let step = grid;
-    let i = startIndex ? startIndex : 0;
-    let t0;
-    let t1;
-    let elapsed;
-    self.postMessage({ step, iteration: startIndex ? startIndex : 0 });
-    t0 = self.performance.now();
-    self.requestAnimationFrame(next);
-    function next() {
-        if (i >= maxIterations)
-            return;
-        self.requestAnimationFrame(next);
-        t1 = self.performance.now();
-        elapsed = t1 - t0;
-        if (elapsed > throttle) {
-            t0 = t1 - (elapsed % throttle);
-            step = gol(step);
-            // If there are no changes, game has stalled out
-            if (step === false) {
+class GameOfLifeWorker {
+    constructor({ data: { startIndex, throttle, maxIterations, grid } }) {
+        this.i = 0;
+        this.next = () => {
+            if (this.i >= this.maxIterations || !this.step)
                 return;
+            self.requestAnimationFrame(this.next);
+            this.t1 = self.performance.now();
+            this.elapsed = this.t1 - this.t0;
+            if (this.elapsed > this.throttle) {
+                this.t0 = this.t1 - (this.elapsed % this.throttle);
+                this.step = gol(this.step);
+                // If there are no changes, game has stalled out
+                if (this.step === false) {
+                    return;
+                }
+                this.i++;
+                self.postMessage({
+                    step: this.step,
+                    iteration: this.i,
+                    framerate: Math.round(1000 / this.elapsed),
+                });
             }
-            i++;
-            self.postMessage({
-                step,
-                iteration: i,
-                framerate: Math.round(1000 / elapsed),
-            });
+        };
+        this.step = grid;
+        this.throttle = throttle;
+        this.maxIterations = maxIterations;
+        if (startIndex) {
+            this.i = startIndex;
         }
+        self.postMessage({ step: grid, iteration: this.i });
+        this.t0 = self.performance.now();
+        self.requestAnimationFrame(this.next);
+    }
+    setThrottle(throttle) {
+        this.throttle = throttle;
+    }
+    setMaxIterations(maxIterations) {
+        this.maxIterations = maxIterations;
+    }
+    setCellState({ x, y, state }) {
+        this.step[x][y] = state;
+    }
+}
+let golWorker;
+onmessage = function (e) {
+    if (!golWorker) {
+        golWorker = new GameOfLifeWorker(e);
+    }
+    switch (e.data.action) {
+        case 'SET_THROTTLE':
+            golWorker.setThrottle(e.data.payload);
+            break;
+        case 'MAX_ITERATIONS':
+            golWorker.setMaxIterations(e.data.payload);
+            break;
+        case 'SET_CELL_STATE':
+            golWorker.setCellState(e.data.payload);
+            break;
     }
 };
 //# sourceMappingURL=gol.js.map

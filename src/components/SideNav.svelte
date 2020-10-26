@@ -23,8 +23,8 @@
     <NavLink to="/game-of-life" icon="/img/gol.png" configurable>
         Game of Life
         <div slot="options">
-            <NavOption to="/ulam-spiral/information" icon="info" />
-            <NavOption to="/ulam-spiral/configure" icon="cog" />
+            <NavOption to="/game-of-life/information" icon="info" />
+            <NavOption to="/game-of-life/configure" icon="cog" />
         </div>
     </NavLink>
 </ul>

@@ -11,14 +11,12 @@
         dataUrl,
     } from '../../store/spiral';
 
-    import MainLayout from '../../layouts/MainLayout.svelte';
+    import ConfigureLayout from '../../layouts/ConfigureLayout.svelte';
     import UlamSpiral from '../../components/UlamSpiral.svelte';
-    import BackButton from '../../components/BackButton.svelte';
     import Slider from '../../components/Slider.svelte';
     import ColorPicker from '../../components/ColorPicker.svelte';
     import FieldGroup from '../../components/FieldGroup.svelte';
     import FieldLabel from '../../components/FieldLabel.svelte';
-    import Button from '../../components/Button.svelte';
 </script>
 
 <style>
@@ -36,35 +34,27 @@
     }
 </style>
 
-<MainLayout>
-    <div slot="sidebar">
-        <BackButton to="/ulam-spiral" />
-
-        <h1>Configure</h1>
-
+<ConfigureLayout>
+    <div slot="settings">
         <FieldGroup title="Style">
             <FieldLabel for="backgroundColor">Background</FieldLabel>
             <ColorPicker id="backgroundColor" bind:color={$backgroundColor} />
-        </FieldGroup>
 
-        <FieldGroup title="Prime Number Dots">
-            <FieldLabel for="dotColor">Color</FieldLabel>
+            <FieldLabel for="dotColor">Dot Color</FieldLabel>
             <ColorPicker id="dotColor" bind:color={$dotColor} />
 
-            <FieldLabel for="dotSize">Size</FieldLabel>
+            <FieldLabel for="dotSize">Dot Size</FieldLabel>
             <Slider
                 id="dotSize"
                 min={1}
                 max={4}
                 step={0.5}
                 bind:value={$dotSize} />
-        </FieldGroup>
 
-        <FieldGroup title="Grid">
             <FieldLabel for="showGrid">Show Grid</FieldLabel>
             <input id="showGrid" type="checkbox" bind:checked={$showGrid} />
 
-            <FieldLabel for="dotColor">Color</FieldLabel>
+            <FieldLabel for="dotColor">Grid Color</FieldLabel>
             <ColorPicker id="dotColor" bind:color={$gridColor} />
 
             <FieldLabel for="lineWidth">Line Width</FieldLabel>
@@ -74,7 +64,6 @@
                 max={4}
                 step={1}
                 bind:value={$gridWidth} />
-
         </FieldGroup>
 
         <FieldGroup title="Performance">
@@ -98,9 +87,9 @@
         <!-- <FieldLabel title="Stats" />
         <FieldLabel title="Number of primes" />
         <FieldLabel title="Rendered in 20ms" />
- -->
+        -->
     </div>
     <div slot="content">
         <UlamSpiral />
     </div>
-</MainLayout>
+</ConfigureLayout>

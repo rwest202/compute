@@ -1,5 +1,11 @@
 <script lang="ts">
-    import { PaperScope, Path, Point, Color } from 'paper/dist/paper-core';
+    import {
+        PaperScope,
+        Path,
+        Point,
+        Color,
+        Shape,
+    } from 'paper/dist/paper-core';
     import { onMount, onDestroy } from 'svelte';
 
     import { contentDimensions } from '../utils';
@@ -19,14 +25,16 @@
     // constant is arbitrariily picked because it fills the screen with dots
     const DENSITY_CONSTANT = 3000;
 
+    const [w, h] = contentDimensions();
+
     const paper = new PaperScope();
     let canvas: HTMLCanvasElement;
     let worker: Worker;
+    let background: paper.Shape.Rectangle;
 
     $: {
         // Reactive update when these variables change
-        $backgroundColor,
-            $dotColor,
+        $dotColor,
             $dotSize,
             $showGrid,
             $gridColor,
@@ -34,6 +42,13 @@
             $density,
             $throttle;
         draw();
+    }
+
+    $: {
+        if (paper.project) {
+            background.fillColor = new Color($backgroundColor);
+            background.size = new Size(w, h);
+        }
     }
 
     onMount(() => {
@@ -60,6 +75,8 @@
         paper.project && paper.project.remove();
         paper.setup(canvas);
 
+        background = new Shape.Rectangle(new Point(0, 0), new Size(w, h));
+
         paper.view.viewSize.width = w;
         paper.view.viewSize.height = h;
 
@@ -68,9 +85,6 @@
 
         // Refers to pre-built worker file
         worker = new Worker('/workers/spiral.js');
-
-        const background = new Path.Rectangle(new Point(0, 0), new Size(w, h));
-        background.fillColor = new Color($backgroundColor);
 
         // Draw Ulam Sprial grid
         if ($showGrid) {

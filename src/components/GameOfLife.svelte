@@ -1,34 +1,70 @@
 <script lang="ts">
-    import { PaperScope, Path } from 'paper/dist/paper-core';
+    import {
+        PaperScope,
+        Path,
+        Point,
+        Color,
+        Size,
+        Shape,
+    } from 'paper/dist/paper-core';
     import { onMount, onDestroy } from 'svelte';
 
     import { contentDimensions } from 'src/utils';
-    import { ALIVE } from 'src/math/gol';
-
+    import { ALIVE, DEAD } from 'src/math/gol';
     import { initialGrid } from 'src/math/gol';
     import type { Grid } from 'src/math/gol';
+    import {
+        dotColor,
+        backgroundColor,
+        fpsThrottle,
+        steps,
+        fps,
+        paused,
+        maxIterations,
+    } from 'src/store/gol';
 
-    const MAX_ITERATIONS = 1000;
-    const THROTTLE = 1000 / 21;
+    const [w, h] = contentDimensions();
+
+    const THROTTLE = 1000 / $fpsThrottle;
 
     const paper = new PaperScope();
     let canvas: HTMLCanvasElement;
-    let drawGrid: paper.Path.Circle[][];
-    const black = new paper.Color('black');
-    const transparent = new paper.Color('transparent');
+    let drawDots: paper.Path.Circle[][];
+    let drawGrid: paper.Path.Rectangle[][];
+    let dotColorPaper: paper.Color;
+    const transparent = new Color('transparent');
+    const grey = new Color('#dcdcdc');
+    let background: paper.Shape.Rectangle;
     let x: number;
     let y: number;
 
     let worker: Worker;
-    let steps = 0;
-    let paused = false;
     let savedGrid: Grid | undefined;
 
-    let fps = 0;
+    paused.subscribe((val) => {
+        worker && (val ? pause() : play());
+    });
 
+    // Update dot size and background color
     $: {
-        draw();
+        dotColorPaper = new Color($dotColor);
+        if (paper.project) {
+            background.fillColor = new Color($backgroundColor);
+            background.size = new Size(w, h);
+        }
     }
+
+    // Update Throttle
+    $: worker?.postMessage({
+        action: 'SET_THROTTLE',
+        payload: 1000 / $fpsThrottle,
+    });
+
+    // Update Max Iterations
+    $: worker?.postMessage({
+        action: 'SET_MAX_ITERATIONS',
+        payload: $maxIterations,
+    });
 
     onMount(() => {
         draw();
@@ -39,13 +75,13 @@
         // Initiate Game of Life iterations in separate worker
         worker.postMessage({
             grid: initialGrid,
-            maxIterations: MAX_ITERATIONS,
+            maxIterations: $maxIterations,
             throttle: THROTTLE,
         });
         worker.onmessage = drawGameOfLife;
 
         window.addEventListener('resize', () => {
-            pause();
+            paused.set(true);
             draw();
         });
     });
@@ -67,21 +103,98 @@
         paper.project && paper.project.remove();
         paper.setup(canvas);
 
+        background = new Shape.Rectangle(new Point(0, 0), new Size(w, h));
+
         paper.view.viewSize.width = w;
         paper.view.viewSize.height = h;
 
         x = paper.view.bounds.width / 2;
         y = paper.view.bounds.height / 2;
 
-        drawGrid = new Array(50).fill(null).map((_, i) =>
-            new Array(50).fill(null).map(
-                (_, j) =>
-                    new Path.Circle({
-                        center: [x + (i - 25) * 8, y + (j - 25) * 8],
-                        radius: 3,
-                    })
-            )
+        drawDots = new Array(50).fill(null).map((_, i) =>
+            new Array(50).fill(null).map((_, j) => {
+                const dot = new Path.Circle({
+                    center: [x + (i - 25) * 16, y + (j - 25) * 16],
+                    radius: 6,
+                });
+                dot.fillColor = dotColorPaper;
+                dot.opacity = 0;
+                dot.insertAbove(background);
+                return dot;
+            })
         );
+
+        drawGrid = new Array(50)
+            .fill(null)
+            .map((_, i) =>
+                new Array(50)
+                    .fill(null)
+                    .map(
+                        (_, j) =>
+                            new Path.Rectangle(
+                                new Point(
+                                    x + (i - 25) * 16 - 6,
+                                    y + (j - 25) * 16 - 6
+                                ),
+                                new Size(12, 12)
+                            )
+                    )
+            );
+
+        let lastX;
+        let lastY;
+        paper.view.onMouseMove = (e) => {
+            // Duplicate
+            const xPos = Math.round((e.point.x - x) / 16) + 25;
+            const yPos = Math.round((e.point.y - y) / 16) + 25;
+
+            if (lastX !== undefined && lastY !== undefined) {
+                const square = drawGrid[lastX][lastY];
+                if (square.fillColor) {
+                    square.fillColor = transparent;
+                }
+            }
+
+            const square = drawGrid[xPos]?.[yPos];
+            if (square) {
+                square.fillColor = grey;
+                square.insertAbove(background);
+
+                lastX = xPos;
+                lastY = yPos;
+            }
+        };
+
+        paper.view.onMouseDown = (e) => {
+            // Duplicate
+            const xPos = Math.round((e.point.x - x) / 16) + 25;
+            const yPos = Math.round((e.point.y - y) / 16) + 25;
+
+            const dot = drawDots[xPos]?.[yPos];
+            if (dot) {
+                // Is not transparent, meanings it's alive.
+                let newState: typeof ALIVE | typeof DEAD = DEAD;
+                if (dot.opacity > 0) {
+                    dot.opacity = 0;
+                } else {
+                    newState = ALIVE;
+                    dot.opacity = 1;
+                }
+
+                if ($paused && savedGrid) {
+                    savedGrid[xPos][yPos] = newState;
+                } else if (!$paused) {
+                    worker?.postMessage({
+                        action: 'SET_CELL_STATE',
+                        payload: {
+                            x: xPos,
+                            y: yPos,
+                            state: newState,
+                        },
+                    });
+                }
+            }
+        };
     }
 
     function drawGameOfLife({
@@ -96,20 +209,22 @@
         } else {
             for (let i = 0; i < step.length; i++) {
                 for (let j = 0; j < step[i].length; j++) {
-                    if (step[i][j] !== savedGrid?.[i]?.[j]) {
-                        if (step[i][j] === ALIVE) {
-                            drawGrid[i][j].fillColor = black;
-                        } else {
-                            drawGrid[i][j].fillColor = transparent;
-                        }
+                    if (step[i][j] === ALIVE) {
+                        drawDots[i][j].opacity = 1;
+                    } else {
+                        drawDots[i][j].opacity = 0;
                     }
                 }
             }
             savedGrid = step;
-            steps = iteration;
+            steps.set(iteration);
             if (framerate) {
-                fps = framerate;
+                fps.set(framerate);
             }
+        }
+
+        if (iteration === $maxIterations) {
+            worker.terminate();
         }
     }
 
@@ -121,21 +236,18 @@
         // Initiate Game of Life with saved grid in separate worker
         worker.postMessage({
             grid: savedGrid,
-            startIndex: steps,
-            maxIterations: MAX_ITERATIONS,
+            startIndex: $steps,
+            maxIterations: $maxIterations,
             throttle: THROTTLE,
         });
 
         worker.onmessage = drawGameOfLife;
-
         savedGrid = undefined;
-        paused = false;
     }
 
     function pause() {
         // Pause! Stop execution and save grid
-        worker.terminate();
-        paused = true;
+        worker && worker.terminate();
     }
 </script>
 
@@ -149,12 +261,3 @@
 </style>
 
 <canvas bind:this={canvas} />
-
-<div class="hud">
-    <button on:click={() => (paused ? play() : pause())}>
-        {#if paused}play{:else}pause{/if}
-    </button>
-    {steps}
-    Steps &nbsp; FPS
-    {fps}
-</div>

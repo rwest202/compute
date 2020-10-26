@@ -1,4 +1,3 @@
-import rollup from 'rollup';
 import sveltePreprocess from 'svelte-preprocess';
 import svelte from 'rollup-plugin-svelte';
 import resolve from '@rollup/plugin-node-resolve';
