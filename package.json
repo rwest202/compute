@@ -27,7 +27,7 @@
         "rollup-plugin-terser": "6.1.0",
         "rollup-plugin-visualizer": "4.0.4",
         "sirv-cli": "1.0.3",
-        "svelte": "3.24.0",
+        "svelte": "3.49.0",
         "svelte-preprocess": "4.0.8",
         "tslib": "2.0.0",
         "typescript": "3.9.7"
