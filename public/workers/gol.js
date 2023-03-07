@@ -4,7 +4,7 @@ function gol (grid) {
     var _a, _b, _c, _d, _e, _f, _g, _h;
     let changed = false;
     // Copy multi-dimensional array
-    const newGrid = grid.map(row => row.slice());
+    const newGrid = grid.map((row) => row.slice());
     for (let i = 0; i < grid.length; i++) {
         for (let j = 0; j < grid[i].length; j++) {
             const NW = ((_a = grid[i - 1]) === null || _a === void 0 ? void 0 : _a[j - 1]) || 0;
@@ -37,9 +37,28 @@ function gol (grid) {
     }
     return changed ? newGrid : false;
 }
+/*
+ * - - - - -
+ * - - 0 0 -
+ * - 0 0 - -
+ * - - - - -
+ * */
+const initialGrid = Array.from({ length: 50 })
+    .fill(Array.from({ length: 50 }).fill(0))
+    .map((_, row) => _.map((_, col) => {
+    if (row === 24 && col === 24)
+        return ALIVE;
+    if (row === 24 && col === 25)
+        return ALIVE;
+    if (row === 25 && col === 23)
+        return ALIVE;
+    if (row === 25 && col === 24)
+        return ALIVE;
+    return DEAD;
+}));
 
 class GameOfLifeWorker {
-    constructor({ data: { startIndex, throttle, maxIterations, grid } }) {
+    constructor({ data: { startIndex, throttle, maxIterations, grid }, }) {
         this.i = 0;
         this.next = () => {
             if (this.i >= this.maxIterations || !this.step)
@@ -49,11 +68,12 @@ class GameOfLifeWorker {
             this.elapsed = this.t1 - this.t0;
             if (this.elapsed > this.throttle) {
                 this.t0 = this.t1 - (this.elapsed % this.throttle);
-                this.step = gol(this.step);
+                const nextStep = gol(this.step);
                 // If there are no changes, game has stalled out
-                if (this.step === false) {
+                if (nextStep === false) {
                     return;
                 }
+                this.step = nextStep;
                 this.i++;
                 self.postMessage({
                     step: this.step,

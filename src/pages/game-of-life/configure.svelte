@@ -7,6 +7,7 @@
         steps,
         fps,
         maxIterations,
+        gridSize,
     } from '../../store/gol';
 
     import ConfigureLayout from '../../layouts/ConfigureLayout.svelte';
@@ -26,21 +27,6 @@
     }
 </script>
 
-<style>
-    h1 {
-        color: white;
-        font-size: 30px;
-        margin-top: 30px 0;
-    }
-
-    /* Windows Chrome, make configure section scrollable */
-    [slot='sidebar'] {
-        height: 100%;
-        overflow: auto;
-        padding: 30px;
-    }
-</style>
-
 <ConfigureLayout>
     <div slot="settings">
         <FieldGroup title="Controls">
@@ -52,7 +38,8 @@
             <input
                 id="maxIterations"
                 type="number"
-                bind:value={$maxIterations} />
+                bind:value={$maxIterations}
+            />
         </FieldGroup>
         <FieldGroup title="Style">
             <FieldLabel for="backgroundColor">Background</FieldLabel>
@@ -70,7 +57,11 @@
                 min={1}
                 max={30}
                 step={1}
-                bind:value={$fpsThrottle} />
+                bind:value={$fpsThrottle}
+            />
+
+            <FieldLabel for="size">Grid Size</FieldLabel>
+            <input id="gridSize" type="number" bind:value={$gridSize} />
         </FieldGroup>
         <FieldGroup title="Stats">
             <FieldLabel>Steps</FieldLabel>
@@ -84,3 +75,18 @@
         <GameOfLife />
     </div>
 </ConfigureLayout>
+
+<style>
+    h1 {
+        color: white;
+        font-size: 30px;
+        margin-top: 30px 0;
+    }
+
+    /* Windows Chrome, make configure section scrollable */
+    [slot='sidebar'] {
+        height: 100%;
+        overflow: auto;
+        padding: 30px;
+    }
+</style>

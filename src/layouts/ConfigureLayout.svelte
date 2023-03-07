@@ -3,6 +3,19 @@
     import BackButton from '../components/BackButton.svelte';
 </script>
 
+<MainLayout>
+    <div slot="sidebar">
+        <BackButton to="/ulam-spiral" />
+
+        <h1>Configure</h1>
+
+        <slot name="settings" />
+    </div>
+    <div slot="content">
+        <slot name="content" />
+    </div>
+</MainLayout>
+
 <style>
     h1 {
         color: white;
@@ -17,16 +30,3 @@
         padding: 30px;
     }
 </style>
-
-<MainLayout>
-    <div slot="sidebar">
-        <BackButton to="/ulam-spiral" />
-
-        <h1>Configure</h1>
-
-        <slot name="settings" />
-    </div>
-    <div slot="content">
-        <slot name="content" />
-    </div>
-</MainLayout>

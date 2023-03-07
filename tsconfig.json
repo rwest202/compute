@@ -10,12 +10,12 @@
         "strictFunctionTypes": true,
         "strictPropertyInitialization": true,
         "strictNullChecks": true,
-        "sourceMap": false,
+        "sourceMap": true,
         "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
         "paths": {
             "paper": ["paper.d.ts"]
         },
-        "noEmitOnError": false,
+        "noEmitOnError": false
     }
 }

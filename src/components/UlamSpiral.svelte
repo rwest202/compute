@@ -31,17 +31,58 @@
     let canvas: HTMLCanvasElement;
     let worker: Worker;
     let background: paper.Shape.Rectangle;
+    let dots: paper.Path.Circle[] = [];
+    let line: paper.Path;
 
     $: {
         // Reactive update when these variables change
-        $dotColor,
-            $dotSize,
-            $showGrid,
-            $gridColor,
-            $gridWidth,
-            $density,
-            $throttle;
+
+        $density;
+        dots.forEach((dot) => {
+            dot.remove();
+        });
+        dots = [];
         draw();
+    }
+
+    $: {
+        let color = new Color($dotColor);
+        if (paper.project) {
+            // Draw Ulam Sprial grid
+            if ($showGrid) {
+                if (line) line.remove();
+
+                const x = paper.view.bounds.width / 2;
+                const y = paper.view.bounds.height / 2;
+                line = new Path({
+                    from: [x, y],
+                    strokeWidth: $gridWidth,
+                    strokeColor: $gridColor,
+                });
+                line.moveTo(new Point(x, y));
+                for (let i = 1; i < DENSITY_CONSTANT / $density; i++) {
+                    const even = i % 2 === 0;
+                    line.lineBy(
+                        new Point((even ? -$density : $density) * i, 0)
+                    );
+                    line.lineBy(
+                        new Point(0, (even ? $density : -$density) * i)
+                    );
+                }
+            } else {
+                line && line.remove();
+            }
+
+            dots = dots.map((dot) => {
+                const newDot = new Path.Circle({
+                    center: dot.position,
+                    radius: $dotSize,
+                    fillColor: color,
+                });
+                dot.remove();
+                return newDot;
+            });
+        }
     }
 
     $: {
@@ -86,21 +127,6 @@
         // Refers to pre-built worker file
         worker = new Worker('/workers/spiral.js');
 
-        // Draw Ulam Sprial grid
-        if ($showGrid) {
-            const line = new Path({
-                from: [x, y],
-                strokeWidth: $gridWidth,
-                strokeColor: $gridColor,
-            });
-            line.moveTo(new Point(x, y));
-            for (let i = 1; i < DENSITY_CONSTANT / $density; i++) {
-                const even = i % 2 === 0;
-                line.lineBy(new Point((even ? -$density : $density) * i, 0));
-                line.lineBy(new Point(0, (even ? $density : -$density) * i));
-            }
-        }
-
         // Initiate prime number calculations in separate worker
         worker.postMessage({
             x,
@@ -115,11 +141,13 @@
             if (!paper.view) {
                 worker && worker.terminate();
             } else {
-                new Path.Circle({
-                    center: data,
-                    radius: $dotSize,
-                    fillColor: $dotColor,
-                });
+                dots.push(
+                    new Path.Circle({
+                        center: data,
+                        radius: $dotSize,
+                        fillColor: $dotColor,
+                    })
+                );
             }
         }
         worker.onmessage = drawPrimeDots;

@@ -21,6 +21,7 @@
         fps,
         paused,
         maxIterations,
+        gridSize,
     } from 'src/store/gol';
 
     const [w, h] = contentDimensions();
@@ -31,7 +32,7 @@
     let canvas: HTMLCanvasElement;
     let drawDots: paper.Path.Circle[][];
     let drawGrid: paper.Path.Rectangle[][];
-    let dotColorPaper: paper.Color;
+    let dotColorPaper = new Color($dotColor);
     const transparent = new Color('transparent');
     const grey = new Color('#dcdcdc');
     let background: paper.Shape.Rectangle;
@@ -47,10 +48,18 @@
 
     // Update dot size and background color
     $: {
-        dotColorPaper = new Color($dotColor);
-        if (paper.project) {
+        if (background) {
             background.fillColor = new Color($backgroundColor);
-            background.size = new Size(w, h);
+        }
+    }
+
+    // Update dot color
+    $: {
+        if (drawDots) {
+            const newColor = new Color($dotColor);
+            drawDots.forEach((row) =>
+                row.forEach((dot) => (dot.fillColor = newColor))
+            );
         }
     }
 
@@ -74,7 +83,7 @@
 
         // Initiate Game of Life iterations in separate worker
         worker.postMessage({
-            grid: initialGrid,
+            grid: initialGrid($gridSize),
             maxIterations: $maxIterations,
             throttle: THROTTLE,
         });
@@ -111,23 +120,27 @@
         x = paper.view.bounds.width / 2;
         y = paper.view.bounds.height / 2;
 
-        drawDots = new Array(50).fill(null).map((_, i) =>
-            new Array(50).fill(null).map((_, j) => {
-                const dot = new Path.Circle({
-                    center: [x + (i - 25) * 16, y + (j - 25) * 16],
-                    radius: 6,
-                });
-                dot.fillColor = dotColorPaper;
-                dot.opacity = 0;
-                dot.insertAbove(background);
-                return dot;
-            })
-        );
-
-        drawGrid = new Array(50)
+        drawDots = Array.from({ length: $gridSize })
             .fill(null)
             .map((_, i) =>
-                new Array(50)
+                Array.from({ length: $gridSize })
+                    .fill(null)
+                    .map((_, j) => {
+                        const dot = new Path.Circle({
+                            center: [x + (i - 25) * 16, y + (j - 25) * 16],
+                            radius: 6,
+                        });
+                        dot.fillColor = dotColorPaper;
+                        dot.opacity = 0;
+                        dot.insertAbove(background);
+                        return dot;
+                    })
+            );
+
+        drawGrid = Array.from({ length: $gridSize })
+            .fill(null)
+            .map((_, i) =>
+                Array.from({ length: $gridSize })
                     .fill(null)
                     .map(
                         (_, j) =>
@@ -195,6 +208,18 @@
                 }
             }
         };
+
+        if (savedGrid) {
+            for (let i = 0; i < savedGrid.length; i++) {
+                for (let j = 0; j < savedGrid[i].length; j++) {
+                    if (savedGrid[i][j] === ALIVE) {
+                        drawDots[i][j].opacity = 1;
+                    } else {
+                        drawDots[i][j].opacity = 0;
+                    }
+                }
+            }
+        }
     }
 
     function drawGameOfLife({
@@ -251,6 +276,8 @@
     }
 </script>
 
+<canvas bind:this={canvas} />
+
 <style>
     .hud {
         position: absolute;
@@ -259,5 +286,3 @@
         left: 15px;
     }
 </style>
-
-<canvas bind:this={canvas} />

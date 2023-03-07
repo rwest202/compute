@@ -7,7 +7,7 @@
         "dev-build": "rollup -c -w",
         "analyze": "rollup -c -p 'rollup-plugin-analyzer={ summaryOnly: true }'",
         "worker": "rollup -c worker.config.js -w",
-        "start": "sirv public -s"
+        "start": "sirv public -s --port 5555"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "14.0.0",
