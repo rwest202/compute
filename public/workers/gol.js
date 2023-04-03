@@ -37,25 +37,6 @@ function gol (grid) {
     }
     return changed ? newGrid : false;
 }
-/*
- * - - - - -
- * - - 0 0 -
- * - 0 0 - -
- * - - - - -
- * */
-const initialGrid = Array.from({ length: 50 })
-    .fill(Array.from({ length: 50 }).fill(0))
-    .map((_, row) => _.map((_, col) => {
-    if (row === 24 && col === 24)
-        return ALIVE;
-    if (row === 24 && col === 25)
-        return ALIVE;
-    if (row === 25 && col === 23)
-        return ALIVE;
-    if (row === 25 && col === 24)
-        return ALIVE;
-    return DEAD;
-}));
 
 class GameOfLifeWorker {
     constructor({ data: { startIndex, throttle, maxIterations, grid }, }) {
